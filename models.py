@@ -3,7 +3,13 @@
 import tensorflow as tf;
 import tensorflow_addons as tfa;
 
-def MLPMixer(input_shape, num_classes, patch_size = 32, hidden_dim = 768, num_blocks = 12, tokens_mlp_dim = 3072, channels_mlp_dim = 3072):
+configs = {
+  'b16': {'patch_size': 16, 'hidden_dim': 768, 'num_blocks': 12, 'tokens_mlp_dim': 384, 'channels_mlp_dim': 3072},
+  'b32': {'patch_size': 32, 'hidden_dim': 768, 'num_blocks': 12, 'tokens_mlp_dim': 384, 'channels_mlp_dim': 3072},
+  'l16': {'patch_size': 16, 'hidden_dim': 1024, 'num_blocks': 24, 'tokens_mlp_dim': 512, 'channels_mlp_dim': 4096},
+}
+
+def MLPMixer(input_shape, num_classes, patch_size = 16, hidden_dim = 1024, num_blocks = 24, tokens_mlp_dim = 512, channels_mlp_dim = 4096):
   inputs = tf.keras.Input(input_shape); # inputs.shape = (batch, h, w, c)
   results = tf.keras.layers.Conv2D(hidden_dim, kernel_size = (patch_size, patch_size), strides = (patch_size, patch_size))(inputs); # results.shape = (batch, h / patch, w / patch, hidden_dim)
   results = tf.keras.layers.Reshape((-1, results.shape[-1]))(results); # results.shape = (batch, h * w / patch ** 2, hidden_dim)
@@ -34,9 +40,10 @@ def MLPMixer(input_shape, num_classes, patch_size = 32, hidden_dim = 768, num_bl
   return tf.keras.Model(inputs = inputs, outputs = results);
 
 if __name__ == "__main__":
-  mlpmixer = MLPMixer(input_shape = (224,224,3), num_classes = 10);
-  mlpmixer.save('mlpmixer.h5');
+  for key, config in configs.items():
+    model = MLPMixer(input_shape = (224,224,3), num_classes = 1000, **config);
+    model.save('%s.h5' % key);
   import numpy as np;
   inputs = np.random.normal(size = (4, 224,224,3));
-  outputs = mlpmixer(inputs);
+  outputs = model(inputs);
   print(outputs.shape);
