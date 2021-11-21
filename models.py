@@ -36,3 +36,7 @@ def MLPMixer(input_shape, patch_size, hidden_dim, num_blocks, tokens_mlp_dim, ch
 if __name__ == "__main__":
   mlpmixer = MLPMixer((224,224,3), 16, 32, 4, 32, 32, 10);
   mlpmixer.save('mlpmixer.h5');
+  import numpy as np;
+  inputs = np.random.normal(size = (4, 224,224,3));
+  outputs = mlpmixer(inputs);
+  print(outputs.shape);
