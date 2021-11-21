@@ -9,7 +9,7 @@ configs = {
   'l16': {'patch_size': 16, 'hidden_dim': 1024, 'num_blocks': 24, 'tokens_mlp_dim': 512, 'channels_mlp_dim': 4096},
 }
 
-def MLPMixer(input_shape, num_classes, patch_size = 16, hidden_dim = 1024, num_blocks = 24, tokens_mlp_dim = 512, channels_mlp_dim = 4096):
+def MLPMixer(input_shape, num_classes, patch_size = 16, hidden_dim = 1024, num_blocks = 24, tokens_mlp_dim = 512, channels_mlp_dim = 4096, include_top = True):
   inputs = tf.keras.Input(input_shape); # inputs.shape = (batch, h, w, c)
   results = tf.keras.layers.Conv2D(hidden_dim, kernel_size = (patch_size, patch_size), strides = (patch_size, patch_size))(inputs); # results.shape = (batch, h / patch, w / patch, hidden_dim)
   results = tf.keras.layers.Reshape((-1, results.shape[-1]))(results); # results.shape = (batch, h * w / patch ** 2, hidden_dim)
@@ -36,7 +36,8 @@ def MLPMixer(input_shape, num_classes, patch_size = 16, hidden_dim = 1024, num_b
     results = tf.keras.layers.Add()([skip, results]);
   results = tf.keras.layers.LayerNormalization()(results);
   results = tf.keras.layers.Lambda(lambda x: tf.math.reduce_mean(x, axis = 1))(results); # results.shape = (batch, hidden_dim)
-  results = tf.keras.layers.Dense(num_classes)(results);  
+  if include_top:
+    results = tf.keras.layers.Dense(num_classes, activation = tf.keras.activations.softmax)(results);
   return tf.keras.Model(inputs = inputs, outputs = results);
 
 if __name__ == "__main__":
