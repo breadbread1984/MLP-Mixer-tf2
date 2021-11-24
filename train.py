@@ -17,7 +17,7 @@ def add_options():
 
 def main(unused_argv):
   if exists(FLAGS.checkpoint):
-    model = tf.keras.moidels.load_model(FLAGS.checkpoint, custom_objects = {'tf': tf}, compile = True);
+    model = tf.keras.models.load_model(FLAGS.checkpoint, custom_objects = {'tf': tf}, compile = True);
     optimizer = model.optimizer;
   else:
     model = MLPMixer((32,32,3,), 10, configs[FLAGS.model]);
