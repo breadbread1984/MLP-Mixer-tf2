@@ -22,7 +22,7 @@ def main(unused_argv):
   else:
     model = MLPMixer((32,32,3,), 10, configs[FLAGS.model]);
     optimizer = tf.keras.optimizers.Adam(FLAGS.lr);
-    model.compile(optimizer = opitmizer,
+    model.compile(optimizer = optimizer,
                   loss = [tf.keras.losses.SparseCategoricalCrossentropy()],
                   metrics = [tf.keras.metrics.SparseCategoricalAccuracy()]);
   trainset, testset = load_datasets();
